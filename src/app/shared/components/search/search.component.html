@@ -1,0 +1,28 @@
+<p class="mt-3">To search for a city type the name below.</p>
+
+<ng-template #rt let-r="result" let-t="value">
+    <ngb-highlight [result]="r.display" [term]="r.display"></ngb-highlight>
+</ng-template>
+
+<div class="mt-3">
+
+    <input
+        #instance="ngbTypeahead"
+        type="text"
+        class="form-control"
+        [class.is-invalid]="hasSearchFailed"
+        [(ngModel)]="model"
+        [ngbTypeahead]="searchForCity"
+        [resultTemplate]="rt"
+        [inputFormatter]="formatter"
+        (focus)="handleOnFocus($event)"
+        (blur)="handleOnBlur($event)"
+        (selectItem)="handleItemSelected($event)"
+        placeholder="Type a city name here"
+    />
+
+    <small *ngIf="isSearchInProgress" class="form-text text-muted">Searching...</small>
+
+    <div class="invalid-feedback" *ngIf="hasSearchFailed">Sorry, suggestions could not be loaded.</div>
+
+</div>

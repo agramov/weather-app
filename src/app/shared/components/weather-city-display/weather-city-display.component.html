@@ -1,0 +1,66 @@
+<div *ngIf="!(city && weatherData)" class="spinner-border d-block text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+</div>
+
+<section *ngIf="city && weatherData" class="city-preview mt-1">
+
+    <div class="d-flex justify-content-between heading">
+        <div>
+            <h3 class="mt-0" tabindex="0">{{ city.display }}</h3>
+            <p class="small-text">Generated at: {{ weatherData.current_weather.time || 0 | timestampToForamattedTime }} </p>
+        </div>
+        <app-favorite-widget
+            [isFavorited]="isSelectedCityFavourited"
+            (changed)="handleOnFavoriteChanged($event)">
+        </app-favorite-widget>
+    </div>
+
+    <ul ngbNav #nav="ngbNav" [(activeId)]="active" [destroyOnHide]="false" class="nav-tabs">
+
+        <li [ngbNavItem]="1">
+
+            <button ngbNavLink>Current Weather</button>
+            <ng-template ngbNavContent>
+
+                <div class="current-weather d-flex justify-content-start">
+                    <app-weather-image [weatherCode]="weatherData.current_weather.weathercode || 0"></app-weather-image>
+                    <div class="stats-wrap">
+                        <p class="temperature fw-bold">{{ weatherData.current_weather.temperature }} {{ weatherData.daily_units.temperature_2m_max }}</p>
+                        <p>Precipitation: <span class="fw-bold">{{ weatherData.daily.precipitation_sum[0] }} {{ weatherData.daily_units.precipitation_sum }}</span></p>
+                        <p>Wind: <span class="fw-bold">{{ weatherData.current_weather.winddirection | windDirectionToDisplay }}</span></p>
+                        <p>Wind Speed: <span class="fw-bold">{{ weatherData.current_weather.windspeed }} {{ weatherData.daily_units.windspeed_10m_max }}</span></p>
+                    </div>
+                </div>
+
+            </ng-template>
+        </li>
+
+        <li [ngbNavItem]="2">
+            <button ngbNavLink>5 Days</button>
+            <ng-template ngbNavContent>
+
+                <div class="five-day-forecast d-flex justify-content-evenly flex-wrap">
+
+                    <div *ngFor="let day of weatherData.daily.time.slice(0, 5); let i = index;"
+                        class="daily-forecast d-flex flex-column justify-content-start m-2">
+                        <div class="d-flex flex-column justify-content-center">
+                            <p class="text-center mt-2 mb-0">{{ weatherData.daily.time[i] | timestampToForamattedTime : 'ddd DD/MM' }}</p>
+                            <app-weather-image class="text-center" [weatherCode]="weatherData.daily.weathercode[i] || 0"></app-weather-image>
+                        </div>
+                        <div class="stats-wrap">
+                            <div class="temperature fw-bold"><span class="small-text fw-light">High</span>&nbsp;{{ weatherData.daily.temperature_2m_max[i] }} {{ weatherData.daily_units.temperature_2m_max }}</div>
+                            <div class="temperature fw-bold"><span class="small-text fw-light">Low</span>&nbsp;{{ weatherData.daily.temperature_2m_min[i] }} {{ weatherData.daily_units.temperature_2m_max }}</div>
+                            <div class="daily-metric"><span class="small-text fw-light">Precipitation:</span>&nbsp;<span class="fw-bold">{{ weatherData.daily.precipitation_sum[i] }} {{ weatherData.daily_units.precipitation_sum }}</span></div>
+                            <div class="daily-metric"><span class="small-text fw-light">Wind Speed:</span>&nbsp;<span class="fw-bold">{{ weatherData.daily.windspeed_10m_max[i] }} {{ weatherData.daily_units.windspeed_10m_max }}</span></div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </ng-template>
+        </li>
+    </ul>
+
+    <nav [ngbNavOutlet]="nav"></nav>
+
+</section>
